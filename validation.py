@@ -3,9 +3,10 @@
 Module for validation computation and validation results storing+reading
 """
 import numpy as np
-from sklearn import model_selection
 import pandas as pd
 import pyarrow.parquet as pq
+from sklearn import model_selection
+from sklearn.metrics import matthews_corrcoef
 
 # set random seed for reproduce
 np.random.seed(41732)
@@ -39,6 +40,7 @@ def run(model, hyperparams=None):
             read_data(),
             read_targets(),
             groups=read_metadata().id_measurement,
+            scoring=matthews_corrcoef,
             cv=8)
     return scores
 
