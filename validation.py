@@ -54,7 +54,7 @@ def run(model,
     -------
     Validation results to `/results`.
     """
-    scores = cross_val_score(
+    scores = model_selection.cross_val_score(
             model,
             X,
             y=y,
@@ -62,6 +62,14 @@ def run(model,
             scoring=scoring,
             cv=cv)
     return scores
+
+    #scores = cross_val_score(
+    #        model,
+    #        read_data(),
+    #        read_targets(),
+    #        groups=read_metadata().id_measurement,
+    #        scoring=matthews_corrcoef,
+    #        cv=8)
 
 def read_targets():
     """
