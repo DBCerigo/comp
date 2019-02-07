@@ -15,33 +15,52 @@ np.random.seed(41732)
 TEST_CUTOFF = 100
 
 
-def run(model, hyperparams=None):
+# for scorers and other options see https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html
+
+def run(model,
+        X,
+        y=None,
+        groups=None,
+        scoring=None,
+        cv=5,
+        model_hyperparams=None,
+        ):
     """
     Main validation function.
 
     Parameters
     ----------
-    model: obj
-        Must follow sklearn `estimator` api.
+    model: estimator object implementing ‘fit’
+        Must follow sklearn `BaseEstimator` api.
         (I.e. implement `fit` and `predict` functions.)
-    hyperparams: dict
+        The object to use to fit the data.
+    X: array-like
+        The data to fit. Can be for example a list, or an array.
+    y: array-like, optional, default: None
+        The target variable to try to predict.
+    groups: array-like, with shape (n_samples,), optional
+        Group labels for the samples used while splitting the dataset into
+        train/test set.
+    cv: int
+        Specify the number of folds in a (Stratified)KFold,
+    model_hyperparams: dict
         Optional dict of hyperparameters
 
     Returns
     --------
-    Validation results object.
+    Array of validation scores.
 
     Writes
     -------
-    Validation results to `/results`
+    Validation results to `/results`.
     """
     scores = cross_val_score(
             model,
-            read_data(),
-            read_targets(),
-            groups=read_metadata().id_measurement,
-            scoring=matthews_corrcoef,
-            cv=8)
+            X,
+            y=y,
+            groups=groups,
+            scoring=scoring,
+            cv=cv)
     return scores
 
 def read_targets():
