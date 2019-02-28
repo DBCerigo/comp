@@ -12,6 +12,19 @@ np.random.seed(41732)
 
 # for scorers and other options see https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html
 
+"""
+    Solution to config problem:
+            Set the config on the module every time you use it. This works
+            because that config can be written once in the _specific_ competion
+            module code and passed in one line each time. And thus tracks the
+            config, ties it to the specific competition code, and keeps things
+            clean, ESPECIALLY clean because it means all the paths to data and
+            the store etc are only defined in one places and can make those
+            absolute so that you can run val from any depth location and still
+            works. Nice.
+"""
+
+
 def run(model,
         X,
         y=None,
