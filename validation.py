@@ -75,6 +75,57 @@ def run(model,
     return scores
 
 
-def _store_validation_result():
+def _store_validation_result(
+        store_path,
+        dt,
+        elapsed_time,
+        model_name,
+        model_version,
+        model_desc,
+        model_fit_params,
+        git_sha,
+        val_avg,
+        val_std,
+        val_raw,
+        ):
+    """
+    Stores info on validation run.
+
+    Parameters
+    ----------
+    store_path: str/path
+        Absolute (from here) path to store file.
+    dt: datetime
+        Datetime of validation run (start).
+    elapsed_time: timedelta
+        Time taken for validation to run.
+    model_name: str
+        Evocative/brief name of model. Likely the name of the model class.
+    model_version: str
+        Version num for use on minor variations of a model.
+    model_desc: str
+        Extended description of model.
+    model_fit_params: dict
+        Parameters that were passed to the fit method of the estimator. Can be
+        empty.
+    git_sha: str
+        The sha of the current git commit. Note that `run` should throw if
+        untracked changes present in model code.
+    val_avg: float
+        Average score over cross-validations folds.
+    val_std: float
+        Standard deviation of scores over cross-validations folds.
+    val_raw: list[float]
+        List of floats for raw scores of each cross-validation fold.
+
+    Returns
+    --------
+    None
+
+    Writes
+    -------
+    Validation result `store_path`.
+
+    """
     pass
 
