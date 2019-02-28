@@ -36,12 +36,14 @@ class TestBasicClassifier(unittest.TestCase):
 
         clf = Always1Classifier()
         clf.fit(None)
-        scores = validation.run(
+        scores = validation._default_validaton(
                 clf,
-                range(10),
+                X=range(10),
                 y=[1]*10,
-                cv=5)
-        assert (scores == [1.0]*5).all()
+                cv=5,
+                overide_config=True,
+                )
+        assert (scores[2] == [1.0]*5).all()
 
     def test_score_all_0s(self):
         """
@@ -50,10 +52,12 @@ class TestBasicClassifier(unittest.TestCase):
 
         clf = Always1Classifier()
         clf.fit(None)
-        scores = validation.run(
+        scores = validation._default_validaton(
                 clf,
-                range(10),
+                X=range(10),
                 y=[0]*10,
-                cv=5)
-        assert (scores == [0.0]*5).all()
+                cv=5,
+                overide_config=True,
+                )
+        assert (scores[2] == [0.0]*5).all()
 

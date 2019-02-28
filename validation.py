@@ -30,9 +30,10 @@ Object to completely specify a validation, including metric and data etc.
 Currently this is args for `model_selection.cross_val_score`, but could be made
 to enable an entirely custom val function to be plugged in, depending on the
 comp/aim. Should probably move to having it be plugged in, but good to have
-a default.
+a default. And, should not contain any config specific to the model being
+validated.
 """
-DEFAULT_CONFIG = {
+DEFAULT_VALIDATION_CONFIG = {
         'store_path':None,
         'X':None,
         'y':None,
@@ -41,18 +42,20 @@ DEFAULT_CONFIG = {
         'cv':None,
         }
 
+def set_config(config):
+    pass
 
-
-def run(model,
-        X,
+def _default_validaton(model,
+        model_hyperparams=None,
+        X=None,
         y=None,
         groups=None,
         scoring=None,
         cv=5,
-        model_hyperparams=None,
+        overide_config=False,
         ):
     """
-    Main validation function.
+    Default validation function - k-fold.
 
     Parameters
     ----------
@@ -60,38 +63,50 @@ def run(model,
         Must follow sklearn `BaseEstimator` api.
         (I.e. implement `fit` and `predict` functions.)
         The object to use to fit the data.
-    X: array-like
-        The data to fit. Can be for example a list, or an array.
-    y: array-like, optional, default: None
-        The target variable to try to predict.
-    groups: array-like, with shape (n_samples,), optional
-        Group labels for the samples used while splitting the dataset into
-        train/test set.
-    scoring: string, callable or None, optional, default: None
-        A string (see scikit-learn model evaluation documentation) or a scorer
-        callable object/function with signature `scorer(estimator, X, y)`.
-    cv: int
-        Specify the number of folds in a (Stratified)KFold,
     model_hyperparams: dict
-        Optional dict of hyperparameters
+        Optional - dict of hyperparameters
+    X: array-like
+        Optional - The data to fit. Can be for example a list, or an array.
+    y: array-like, optional, default: None
+        Optional - The target variable to try to predict.
+    groups: array-like, with shape (n_samples,), optional
+        Optional - Group labels for the samples used while splitting the dataset
+        into train/test set.
+    scoring: string, callable or None, optional, default: None
+        Optional - A string (see scikit-learn model evaluation documentation) or
+        a scorer callable object/function with signature
+        `scorer(estimator, X, y)`.
+    cv: int
+        Optional - Specify the number of folds in a (Stratified)KFold,
+    overide_config: bool
+        Optional - Flag to choose whether to use the packages config for val
+        setup or to specify setup explicitly as functions params. If `True` and
+        config params are not `None` exception will be thrown.
 
     Returns
     --------
-    Array of validation scores.
+    Array of: [val_avg, val_std, list[raw validation scores]]
 
-    Writes
-    -------
-    Validation results to `/results`.
     """
-    scores = model_selection.cross_val_score(
-            model,
-            X,
-            y=y,
-            groups=groups,
-            scoring=scoring,
-            cv=cv)
-    return scores
+    if overide_config:
+        scores = model_selection.cross_val_score(
+                model,
+                X,
+                y=y,
+                groups=groups,
+                scoring=scoring,
+                cv=cv,
+                fit_params=model_hyperparams,
+                )
+    return np.mean(scores), np.std(scores), scores
 
+custom_validation = None
+
+def set_custom_validation():
+    pass
+
+def _custom_validation():
+    pass
 
 def _store_validation_result(
         store_path,
