@@ -39,9 +39,9 @@ class TestBasicClassifier(unittest.TestCase):
         scores = validation.run(
                 clf,
                 [x for x in range(10)],
-                y=[1 for x in range(10)],
+                y=[1]*10,
                 cv=5)
-        assert (scores == [1.0 for x in range(5)]).all()
+        assert (scores == [1.0]*5).all()
 
     def test_score_all_0s(self):
         """
@@ -53,7 +53,7 @@ class TestBasicClassifier(unittest.TestCase):
         scores = validation.run(
                 clf,
                 [x for x in range(10)],
-                y=[0 for x in range(10)],
+                y=[0]*10,
                 cv=5)
-        assert (scores == [0.0 for x in range(5)]).all()
+        assert (scores == [0.0]*5).all()
 
