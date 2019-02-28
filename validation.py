@@ -25,6 +25,24 @@ np.random.seed(41732)
 """
 
 
+"""
+Object to completely specify a validation, including metric and data etc.
+Currently this is args for `model_selection.cross_val_score`, but could be made
+to enable an entirely custom val function to be plugged in, depending on the
+comp/aim. Should probably move to having it be plugged in, but good to have
+a default.
+"""
+DEFAULT_CONFIG = {
+        'store_path':None,
+        'X':None,
+        'y':None,
+        'groups':None,
+        'scoring':None,
+        'cv':None,
+        }
+
+
+
 def run(model,
         X,
         y=None,
