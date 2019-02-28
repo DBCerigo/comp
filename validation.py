@@ -36,7 +36,7 @@ def run(model,
     groups: array-like, with shape (n_samples,), optional
         Group labels for the samples used while splitting the dataset into
         train/test set.
-    scoring : string, callable or None, optional, default: None
+    scoring: string, callable or None, optional, default: None
         A string (see scikit-learn model evaluation documentation) or a scorer
         callable object/function with signature `scorer(estimator, X, y)`.
     cv: int
