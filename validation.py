@@ -33,7 +33,7 @@ comp/aim. Should probably move to having it be plugged in, but good to have
 a default. And, should not contain any config specific to the model being
 validated.
 """
-DEFAULT_VALIDATION_CONFIG = {
+DEFAULT_VALIDATION_DEFAULT_CONFIG = {
         'store_path':None,
         'X':None,
         'y':None,
@@ -42,8 +42,48 @@ DEFAULT_VALIDATION_CONFIG = {
         'cv':None,
         }
 
+default_validation_config = None
+
+def reset_config():
+    """
+    Reset default validation config.
+
+    Returns
+    --------
+    None
+
+    Sets
+    --------
+    `default_validation_config`
+
+    """
+    default_validation_config = None
+
+
 def set_config(config):
-    pass
+    """
+    Default validation function - k-fold.
+
+    Parameters
+    ----------
+    config: dict
+        Configuration dictionary used for validation setup.
+
+    Returns
+    --------
+    None
+
+    Sets
+    --------
+    `default_validation_config` with new config values.
+
+    """
+    global default_validation_config
+    default_validation_config = DEFAULT_VALIDATION_DEFAULT_CONFIG
+    for key in config:
+        if key in default_validation_config:
+            default_validation_config[key] = config[key]
+    return default_validation_config
 
 def _default_validaton(model,
         model_hyperparams=None,

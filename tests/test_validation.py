@@ -61,3 +61,25 @@ class TestBasicClassifier(unittest.TestCase):
                 )
         assert (scores[2] == [0.0]*5).all()
 
+class TestSetupConfigForDefaultValidation(unittest.TestCase):
+
+    def test_single_config_set(self):
+        """
+        Test that setting config correctly overwrites package config var.
+        """
+        test_config1 = {'store_path':'some/test/path'}
+
+        validation.set_config(test_config1)
+        assert (validation.default_validation_config['store_path']
+                == test_config1['store_path'])
+
+
+
+    test_config2 = {
+            'store_path':'some/test/path',
+            'X':'testData'
+            }
+    test_config3 = {
+            'store_path':'some/test/path',
+            'bad_key':'foo'
+            }
