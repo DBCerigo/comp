@@ -99,12 +99,12 @@ def set_config(config):
     return default_validation_config
 
 def _default_validaton(model,
-        model_hyperparams=None,
         X=None,
         y=None,
         groups=None,
         scoring=None,
         cv=5,
+        fit_params=None,
         overide_config=False,
         ):
     """
@@ -116,8 +116,6 @@ def _default_validaton(model,
         Must follow sklearn `BaseEstimator` api.
         (I.e. implement `fit` and `predict` functions.)
         The object to use to fit the data.
-    model_hyperparams: dict
-        Optional - dict of hyperparameters
     X: array-like
         Optional - The data to fit. Can be for example a list, or an array.
     y: array-like, optional, default: None
@@ -131,6 +129,8 @@ def _default_validaton(model,
         `scorer(estimator, X, y)`.
     cv: int
         Optional - Specify the number of folds in a (Stratified)KFold,
+    fit_params: dict
+        Optional - dict of hyperparameters
     overide_config: bool
         Optional - Flag to choose whether to use the packages config for val
         setup or to specify setup explicitly as functions params. If `True` and
@@ -149,7 +149,7 @@ def _default_validaton(model,
                 groups=groups,
                 scoring=scoring,
                 cv=cv,
-                fit_params=model_hyperparams,
+                fit_params=fit_params,
                 )
     else:
         scores = model_selection.cross_val_score(
@@ -159,7 +159,7 @@ def _default_validaton(model,
                 groups=default_validation_config['groups'],
                 scoring=default_validation_config['scoring'],
                 cv=default_validation_config['cv'],
-                fit_params=model_hyperparams,
+                fit_params=fit_params,
                 )
     return np.mean(scores), np.std(scores), scores
 
@@ -178,11 +178,11 @@ def _store_validation_result(
         model_name,
         model_version,
         model_desc,
-        model_fit_params,
         git_sha,
         val_avg,
         val_std,
         val_raw,
+        fit_params={},
         ):
     """
     Stores info on validation run.
@@ -201,9 +201,6 @@ def _store_validation_result(
         Version num for use on minor variations of a model.
     model_desc: str
         Extended description of model.
-    model_fit_params: dict
-        Parameters that were passed to the fit method of the estimator. Can be
-        empty.
     git_sha: str
         The sha of the current git commit. Note that `run` should throw if
         untracked changes present in model code.
@@ -213,6 +210,9 @@ def _store_validation_result(
         Standard deviation of scores over cross-validations folds.
     val_raw: list[float]
         List of floats for raw scores of each cross-validation fold.
+    fit_params: dict
+        Parameters that were passed to the fit method of the estimator. Can be
+        empty.
 
     Returns
     --------
