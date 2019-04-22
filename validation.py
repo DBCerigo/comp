@@ -151,6 +151,16 @@ def _default_validaton(model,
                 cv=cv,
                 fit_params=model_hyperparams,
                 )
+    else:
+        scores = model_selection.cross_val_score(
+                model,
+                default_validation_config['X'],
+                y=default_validation_config['y'],
+                groups=default_validation_config['groups'],
+                scoring=default_validation_config['scoring'],
+                cv=default_validation_config['cv'],
+                fit_params=model_hyperparams,
+                )
     return np.mean(scores), np.std(scores), scores
 
 custom_validation = None

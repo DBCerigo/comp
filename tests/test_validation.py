@@ -92,3 +92,22 @@ class TestSetupConfigForDefaultValidation(unittest.TestCase):
         with self.assertRaises(ValueError):
             validation.set_config(test_config2)
 
+class TestBasicClassifierWithConfig(unittest.TestCase):
+
+    def test_score_all_1s(self):
+        """
+        Test validation runs and produces 1.0s for all 1s basic case with config
+        """
+
+        test_config1 = {
+                'store_path':None,
+                'X':range(10),
+                'y':[1]*10,
+                'cv':5,
+                }
+        validation.set_config(test_config1)
+        clf = Always1Classifier()
+        clf.fit(None)
+        scores = validation._default_validaton(clf)
+        assert (scores[2] == [1.0]*5).all()
+
