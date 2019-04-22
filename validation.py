@@ -5,6 +5,10 @@ import numpy as np
 from sklearn import model_selection
 from sklearn.metrics import matthews_corrcoef
 
+import csv
+from datetime import datetime
+import git
+
 # set random seed for reproduce
 np.random.seed(41732)
 # WARN: if using multithreading see https://stackoverflow.com/questions/31057197/should-i-use-random-seed-or-numpy-random-seed-to-control-random-number-gener
@@ -171,6 +175,66 @@ def set_custom_validation():
 def _custom_validation():
     pass
 
+def run(model, model_name, model_version, model_desc, fit_params=None):
+    """
+    Run and store validation on model.
+
+    Parameters
+    ----------
+    model: str/path
+        Absolute (from here) path to store file.
+    model_name: str
+        Evocative/brief name of model. Likely the name of the model class.
+    model_version: str
+        Version num for use on minor variations of a model.
+    model_desc: str
+        Extended description of model.
+    fit_params: dict
+        Parameters that were passed to the fit method of the estimator. Can be
+        empty.
+
+    Returns
+    --------
+    tuple: (validation average, validation standard dev, raw validation scores)
+
+    Writes
+    -------
+    Validation result `store_path`.
+
+    """
+    dt = datetime.now()
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
+    val_avg, val_std, val_raw = _default_validaton(model, fit_params=fit_params)
+    _store_validation_result(
+            default_validation_config['store_path'],
+            dt,
+            datetime.now()-dt,
+            model_name,
+            model_version,
+            model_desc,
+            model.__class__,
+            sha,
+            val_avg,
+            val_std,
+            val_raw,
+            fit_params=fit_params)
+    return val_avg, val_std, val_raw
+
+_validation_result_fields=[
+            'model_name',
+            'val_avg',
+            'val_std',
+            'val_raw',
+            'dt',
+            'elapsed_time',
+            'model_version',
+            'model_desc',
+            'fit_params',
+            '__class__',
+            'git_sha',
+            ]
+
 def _store_validation_result(
         store_path,
         dt,
@@ -178,6 +242,7 @@ def _store_validation_result(
         model_name,
         model_version,
         model_desc,
+        __class__,
         git_sha,
         val_avg,
         val_std,
@@ -201,6 +266,8 @@ def _store_validation_result(
         Version num for use on minor variations of a model.
     model_desc: str
         Extended description of model.
+    __class__: str
+        Output from `model.__class__`
     git_sha: str
         The sha of the current git commit. Note that `run` should throw if
         untracked changes present in model code.
@@ -220,8 +287,14 @@ def _store_validation_result(
 
     Writes
     -------
-    Validation result `store_path`.
+    Validation result to `store_path`.
 
     """
-    pass
+    args_dict = locals()
+    fields = [args_dict[x] for x in _validation_result_fields]
+    fields.append(default_validation_config)
+
+    with open(store_path, 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(fields)
 
