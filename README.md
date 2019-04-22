@@ -9,10 +9,10 @@ some_kaggle_comp_module.py
 
 config = {
     'store_path':'some_absolute_path',
-     'X':data,
-      'y':labels,
-      'scoring':some_scorer,
-      'cv':8}
+    'X':data,
+    'y':labels,
+    'scoring':some_scorer,
+    'cv':8}
 ```
 
 ```
