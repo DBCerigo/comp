@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Module for validation computation and validation results storing+reading
 """
@@ -13,20 +12,32 @@ np.random.seed(41732)
 # for scorers and other options see https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html
 
 """
-    Solution to config problem:
-            Set the config on the module every time you use it. This works
-            because that config can be written once in the _specific_ competion
-            module code and passed in one line each time. And thus tracks the
-            config, ties it to the specific competition code, and keeps things
-            clean, ESPECIALLY clean because it means all the paths to data and
-            the store etc are only defined in one places and can make those
-            absolute so that you can run val from any depth location and still
-            works. Nice.
+Solution to config problem:
+    Set the config on the module every time you use it. This works
+    because that config can be written once in the _specific_ competion
+    module code and passed in one line each time. And thus tracks the
+    config, ties it to the specific competition code, and keeps things
+    clean, ESPECIALLY clean because it means all the paths to data and
+    the store etc are only defined in one place and can make those
+    absolute so that you can run val from any depth location and still
+    works. Nice.
+"""
+
+"""
+Justification for using `global` in this module:
+    The validation, and it's config, should be a singleton. Modules are
+    singletons - using a global var in a module makes that var a singleton,
+    hence I think this is a legitimate use of global.
+    Note that the global is only at module level, not programme level, so you
+    can't access `default_validation_config` without going through
+    `comp.validation.defau...`.
+
 """
 
 
 """
-Object to completely specify a validation, including metric and data etc.
+Object to completely specify a default (k-fold) validation, including metric and
+data etc.
 Currently this is args for `model_selection.cross_val_score`, but could be made
 to enable an entirely custom val function to be plugged in, depending on the
 comp/aim. Should probably move to having it be plugged in, but good to have
@@ -42,7 +53,7 @@ DEFAULT_VALIDATION_DEFAULT_CONFIG = {
         'cv':None,
         }
 
-default_validation_config = None
+default_validation_config = {}
 
 def reset_config():
     """
@@ -62,7 +73,7 @@ def reset_config():
 
 def set_config(config):
     """
-    Default validation function - k-fold.
+    Set config for default validation function - k-fold.
 
     Parameters
     ----------
@@ -83,6 +94,8 @@ def set_config(config):
     for key in config:
         if key in default_validation_config:
             default_validation_config[key] = config[key]
+        else:
+            raise ValueError(f'Bad config key given: {key}')
     return default_validation_config
 
 def _default_validaton(model,
