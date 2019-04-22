@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 
 import csv
 import os
+import shutil
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 from comp import validation
@@ -18,11 +19,19 @@ def _as_absolute(path):
 
 class TestValidationRunAndStore(unittest.TestCase):
 
+    tmp_path = _as_absolute('tmp')
+
+    def setUp(self):
+        os.mkdir(self.tmp_path)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_path)
+
     def test_run_and_store(self):
         """
         Test full validation run and store result
         """
-        store_path = 'test_store.csv'
+        store_path = 'tmp/test_store.csv'
         abs_store_path = _as_absolute(store_path)
         test_config1 = {
                 'store_path':abs_store_path,
@@ -39,9 +48,21 @@ class TestValidationRunAndStore(unittest.TestCase):
             reader = csv.reader(f)
             contents = [row for row in reader]
         print(contents)
-        assert contents[0][0] == 'TestClassifier'
-        assert contents[0][1] == '1.0'
-        assert contents[0][7] == 'A test model'
+        self.assertEqual(contents[0][0], 'model_name')
+        self.assertEqual(contents[0][1], 'val_avg')
+        self.assertEqual(contents[0][4], 'dt')
+        self.assertEqual(contents[1][0], 'TestClassifier')
+        self.assertEqual(contents[1][1], '1.0')
+        self.assertEqual(contents[1][7], 'A test model')
+
+        validation.run(clf,'TestClassifier', '1', 'A test model')
+
+        with open(abs_store_path, 'r') as f:
+            reader = csv.reader(f)
+            contents = [row for row in reader]
+        self.assertEqual(contents[2][0], 'TestClassifier')
+        self.assertEqual(contents[2][1], '1.0')
+        self.assertEqual(contents[2][7], 'A test model')
         os.remove(abs_store_path)
 
 

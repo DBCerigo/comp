@@ -8,6 +8,7 @@ from sklearn.metrics import matthews_corrcoef
 import csv
 from datetime import datetime
 import git
+import os
 
 # set random seed for reproduce
 np.random.seed(41732)
@@ -233,6 +234,7 @@ _validation_result_fields=[
             'fit_params',
             '__class__',
             'git_sha',
+            'validation_config',
             ]
 
 def _store_validation_result(
@@ -291,10 +293,15 @@ def _store_validation_result(
 
     """
     args_dict = locals()
-    fields = [args_dict[x] for x in _validation_result_fields]
+    fields = [args_dict[x] for x in _validation_result_fields if x in args_dict]
     fields.append(default_validation_config)
 
+    write_headers = False
+    if not os.path.isfile(store_path):
+        write_headers = True
     with open(store_path, 'a') as f:
         writer = csv.writer(f)
+        if write_headers:
+            writer.writerow(_validation_result_fields)
         writer.writerow(fields)
 
