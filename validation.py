@@ -292,6 +292,7 @@ def _store_validation_result(
     Validation result to `store_path`.
 
     """
+    # Get function input as an array, in the order specified in `_validation_result_fields`
     args_dict = locals()
     fields = [args_dict[x] for x in _validation_result_fields if x in args_dict]
     fields.append(default_validation_config)
@@ -304,4 +305,3 @@ def _store_validation_result(
         if write_headers:
             writer.writerow(_validation_result_fields)
         writer.writerow(fields)
-
